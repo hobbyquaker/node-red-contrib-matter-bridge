@@ -35,6 +35,20 @@
       "matter-windowcovering": "windowcovering.js",
       "matter-thermostat": "thermostat.js",
       "matter-doorlock": "doorlock.js"
+    }
+  },
+  "devDependencies": {
+    "xo": "^0.59.3"
+  },
+  "xo": {
+    "space": 4,
+    "rules": {
+      "spaced-comment": 0,
+      "capitalized-comments": 0,
+      "unicorn/prevent-abbreviations": "warn",
+      "unicorn/no-this-assignment": "warn",
+      "unicorn/anonymous-default-export": "warn",
+      "unicorn/prefer-module": 0
+    }
   }
-}
 }
