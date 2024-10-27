@@ -1,13 +1,12 @@
-const temperaturesensor = require("../temperaturesensor");
-
-const  Endpoint  = require("@project-chip/matter.js/endpoint").Endpoint;
-const  BridgedDeviceBasicInformationServer  = require("@project-chip/matter.js/behavior/definitions/bridged-device-basic-information").BridgedDeviceBasicInformationServer;
-const  HumiditySensorDevice = require("@project-chip/matter.js/devices/HumiditySensorDevice").HumiditySensorDevice
+const {Endpoint} = require('@project-chip/matter.js/endpoint');
+const {BridgedDeviceBasicInformationServer} = require('@project-chip/matter.js/behavior/definitions/bridged-device-basic-information');
+const {HumiditySensorDevice} = require('@project-chip/matter.js/devices/HumiditySensorDevice');
+const temperaturesensor = require('../temperaturesensor');
 
 module.exports = {
-    humiditysensor: function(child) {
+    humiditysensor(child) {
         const device = new Endpoint(
-            HumiditySensorDevice.with(BridgedDeviceBasicInformationServer),{
+            HumiditySensorDevice.with(BridgedDeviceBasicInformationServer), {
                 id: child.id,
                 bridgedDeviceBasicInformation: {
                     nodeLabel: child.name,
@@ -18,17 +17,17 @@ module.exports = {
                 },
                 relativeHumidityMeasurement: {
                     minMeasuredValue: child.minlevel,
-                    maxMeasuredValue: child.maxlevel
+                    maxMeasuredValue: child.maxlevel,
 
-                }
-            }
-            )
-            device.events.identify.startIdentifying.on(() => {
-                child.emit('identify', true)
-            });
-            device.events.identify.stopIdentifying.on(() => {
-                child.emit('identify', false)
-            });
-            return device;
-    }
- }
+                },
+            },
+        );
+        device.events.identify.startIdentifying.on(() => {
+            child.emit('identify', true);
+        });
+        device.events.identify.stopIdentifying.on(() => {
+            child.emit('identify', false);
+        });
+        return device;
+    },
+};

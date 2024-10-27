@@ -1,108 +1,112 @@
-const logEndpoint = require( "@project-chip/matter.js/device").logEndpoint;
-const EndpointServer = require("@project-chip/matter.js/endpoint").EndpointServer;
+const {logEndpoint} = require('@project-chip/matter.js/device');
+const {EndpointServer} = require('@project-chip/matter.js/endpoint');
 
-module.exports = function(RED) {
+module.exports = function (RED) {
     function MatterDoorLock(config) {
-        RED.nodes.createNode(this,config);
-        var node = this;
+        RED.nodes.createNode(this, config);
+        const node = this;
         node.bridge = RED.nodes.getNode(config.bridge);
-        node.name = config.name
-        console.log(`Loading Device node ${node.id}`)
-        node.status({fill:"red",shape:"ring",text:"not running"});
-        node.pending = false
-        node.pendingmsg = null
-        node.passthrough = /^true$/i.test(config.passthrough)
-        this.on('input', function(msg) {
-            if (msg.topic == 'state'){
-                if (msg.payload){
-                    node.device.set(msg.payload)
+        node.name = config.name;
+        console.log(`Loading Device node ${node.id}`);
+        node.status({fill: 'red', shape: 'ring', text: 'not running'});
+        node.pending = false;
+        node.pendingmsg = null;
+        node.passthrough = /^true$/i.test(config.passthrough);
+        this.on('input', message => {
+            if (message.topic == 'state') {
+                if (message.payload) {
+                    node.device.set(message.payload);
                 }
-                msg.payload = node.device.state
-                node.send(msg)
-                logEndpoint(EndpointServer.forEndpoint(node.bridge.matterServer))
+
+                message.payload = node.device.state;
+                node.send(message);
+                logEndpoint(EndpointServer.forEndpoint(node.bridge.matterServer));
             } else {
-                node.pending = true
-                node.pendingmsg = msg
-                if (msg.payload.state == undefined || typeof(msg.payload) != "object"){
-                    msg.payload = state = {state: msg.payload}
-                } 
-                switch (msg.payload.state){
+                node.pending = true;
+                node.pendingmsg = message;
+                if (message.payload.state == undefined || typeof (message.payload) !== 'object') {
+                    message.payload = state = {state: message.payload};
+                }
+
+                switch (message.payload.state) {
                     case '1':
                     case 1:
                     case 'lock':
                     case 'locked':
-                    case true:
+                    case true: {
                         node.device.set({
                             doorLock: {
                                 lockState: 1,
-                            }
-                        })
-                        break
+                            },
+                        });
+                        break;
+                    }
+
                     case '0':
                     case 0:
                     case 'unlock':
                     case 'unlocked':
-                    case false:
+                    case false: {
                         node.device.set({
                             doorLock: {
                                 lockState: 2,
-                            }
-                        })
-                        break
+                            },
+                        });
+                        break;
+                    }
                 }
             }
-            
         });
-        this.on('serverReady', function() {
-            this.status({fill:"green",shape:"dot",text:"ready"});
-        })
-        
-        this.on('state', function(data){
+        this.on('serverReady', function () {
+            this.status({fill: 'green', shape: 'dot', text: 'ready'});
+        });
+
+        this.on('state', data => {
             if ((node.pending && node.passthrough)) {
-                var msg = node.pendingmsg
-                msg.payload.state=data
-                node.send(msg);
-            } else if (!node.pending){
-                var msg = {payload : {}};
-                msg.payload.state=data
-                node.send(msg);
+                var message = node.pendingmsg;
+                message.payload.state = data;
+                node.send(message);
+            } else if (!node.pending) {
+                var message = {payload: {}};
+                message.payload.state = data;
+                node.send(message);
             }
-            node.pending = false
 
-        })
+            node.pending = false;
+        });
 
-        this.on('identify', function(data){
-            if (data){
-                this.status({fill:"blue",shape:"dot",text:"identify"});
+        this.on('identify', function (data) {
+            if (data) {
+                this.status({fill: 'blue', shape: 'dot', text: 'identify'});
             } else {
-                this.status({fill:"green",shape:"dot",text:"ready"});
+                this.status({fill: 'green', shape: 'dot', text: 'ready'});
             }
-            
-        })
+        });
 
-
-        this.on('close', function(removed, done) {
-            this.removeAllListeners('state')
-            this.removeAllListeners('serverReady')
-            this.removeAllListeners('identify')
+        this.on('close', function (removed, done) {
+            this.removeAllListeners('state');
+            this.removeAllListeners('serverReady');
+            this.removeAllListeners('identify');
             if (removed) {
                 // This node has been disabled/deleted
             } else {
                 // This node is being restarted
             }
+
             done();
         });
         //Wait till server is started
         function waitforserver(node) {
-            if (!node.bridge.serverReady) {
-              setTimeout(waitforserver, 100, node)
+            if (node.bridge.serverReady) {
+                console.log('Registering Child......');
+                node.bridge.emit('registerChild', node);
             } else {
-                console.log('Registering Child......')
-                node.bridge.emit('registerChild', node)
+                setTimeout(waitforserver, 100, node);
             }
         }
-        waitforserver(node)
-        
+
+        waitforserver(node);
     }
-    RED.nodes.registerType("matterdoorlock",MatterDoorLock);
-}
+
+    RED.nodes.registerType('matterdoorlock', MatterDoorLock);
+};

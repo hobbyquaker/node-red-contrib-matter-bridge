@@ -1,13 +1,12 @@
-const temperaturesensor = require("../temperaturesensor");
-
-const  Endpoint  = require("@project-chip/matter.js/endpoint").Endpoint;
-const  BridgedDeviceBasicInformationServer  = require("@project-chip/matter.js/behavior/definitions/bridged-device-basic-information").BridgedDeviceBasicInformationServer;
-const  OccupancySensorDevice = require("@project-chip/matter.js/devices/OccupancySensorDevice").OccupancySensorDevice
+const {Endpoint} = require('@project-chip/matter.js/endpoint');
+const {BridgedDeviceBasicInformationServer} = require('@project-chip/matter.js/behavior/definitions/bridged-device-basic-information');
+const {OccupancySensorDevice} = require('@project-chip/matter.js/devices/OccupancySensorDevice');
+const temperaturesensor = require('../temperaturesensor');
 
 module.exports = {
-    occupancysensor: function(child) {
+    occupancysensor(child) {
         const device = new Endpoint(
-            OccupancySensorDevice.with(BridgedDeviceBasicInformationServer),{
+            OccupancySensorDevice.with(BridgedDeviceBasicInformationServer), {
                 id: child.id,
                 bridgedDeviceBasicInformation: {
                     nodeLabel: child.name,
@@ -17,17 +16,17 @@ module.exports = {
                     reachable: true,
                 },
                 occupancySensing: {
-                    occupancySensorType : child.sensorType,
-                    occupancySensorTypeBitmap: child.sensorTypeBitmap
-                }
+                    occupancySensorType: child.sensorType,
+                    occupancySensorTypeBitmap: child.sensorTypeBitmap,
+                },
             });
 
-            device.events.identify.startIdentifying.on(() => {
-                child.emit('identify', true)
-            });
-            device.events.identify.stopIdentifying.on(() => {
-                child.emit('identify', false)
-            });
-            return device;
-    }
- }
+        device.events.identify.startIdentifying.on(() => {
+            child.emit('identify', true);
+        });
+        device.events.identify.stopIdentifying.on(() => {
+            child.emit('identify', false);
+        });
+        return device;
+    },
+};

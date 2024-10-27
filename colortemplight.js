@@ -1,136 +1,152 @@
-const logEndpoint = require( "@project-chip/matter.js/device").logEndpoint;
-const EndpointServer = require("@project-chip/matter.js/endpoint").EndpointServer;
+const {logEndpoint} = require('@project-chip/matter.js/device');
+const {EndpointServer} = require('@project-chip/matter.js/endpoint');
 
-
-module.exports = function(RED) {
-    function MatterColorTempLight(config) {
-        RED.nodes.createNode(this,config);
-        var node = this;
+module.exports = function (RED) {
+    function MatterColorTemporaryLight(config) {
+        RED.nodes.createNode(this, config);
+        const node = this;
         node.bridge = RED.nodes.getNode(config.bridge);
-        node.name = config.name
-        node.range = config.range
-        node.pending = false
-        node.pendingmsg = null
-        node.passthrough = /^true$/i.test(config.passthrough)
-        console.log(`Loading Device node ${node.id}`)
-        node.status({fill:"red",shape:"ring",text:"not running"});
-        this.on('input', function(msg) {
-            if (msg.topic == 'state'){
-                msg.payload = node.device.state
-                node.send(msg)
-                logEndpoint(EndpointServer.forEndpoint(node.bridge.matterServer))
+        node.name = config.name;
+        node.range = config.range;
+        node.pending = false;
+        node.pendingmsg = null;
+        node.passthrough = /^true$/i.test(config.passthrough);
+        console.log(`Loading Device node ${node.id}`);
+        node.status({fill: 'red', shape: 'ring', text: 'not running'});
+        this.on('input', message => {
+            if (message.topic == 'state') {
+                message.payload = node.device.state;
+                node.send(message);
+                logEndpoint(EndpointServer.forEndpoint(node.bridge.matterServer));
             } else {
-                node.pending = true
-                node.pendingmsg = msg
-                if (msg.payload.state == undefined) {
-                    msg.payload.state = node.device.state.onOff.onOff
+                node.pending = true;
+                node.pendingmsg = message;
+                if (message.payload.state == undefined) {
+                    message.payload.state = node.device.state.onOff.onOff;
                 }
-                if (msg.payload.level == undefined) {
-                    msg.payload.level = node.device.state.levelControl.currentLevel
+
+                if (message.payload.level == undefined) {
+                    message.payload.level = node.device.state.levelControl.currentLevel;
                 }
-                if (node.range == "100"){ msg.payload.level = Math.round(msg.payload.level*2.54)}
-                if (msg.payload.temp) {
-                    var mireds = 1000000/msg.payload.temp
-                }  else {
-                    var mireds = node.device.state.colorControl.colorTemperatureMireds
+
+                if (node.range == '100') {
+                    message.payload.level = Math.round(message.payload.level * 2.54);
                 }
+
+                if (message.payload.temp) {
+                    var mireds = 1_000_000 / message.payload.temp;
+                } else {
+                    var mireds = node.device.state.colorControl.colorTemperatureMireds;
+                }
+
                 node.device.set({
                     levelControl: {
-                        currentLevel: msg.payload.level
+                        currentLevel: message.payload.level,
                     },
                     colorControl: {
-                        colorTemperatureMireds : mireds
-                    }
-                })
+                        colorTemperatureMireds: mireds,
+                    },
+                });
 
-                switch (msg.payload.state){
+                switch (message.payload.state) {
                     case '1':
                     case 1:
                     case 'on':
-                    case true:
+                    case true: {
                         node.device.set({
                             onOff: {
                                 onOff: true,
-                            }
-                        })
-                        break
+                            },
+                        });
+                        break;
+                    }
+
                     case '0':
                     case 0:
                     case 'off':
-                    case false:
+                    case false: {
                         node.device.set({
                             onOff: {
                                 onOff: false,
-                            }
-                        })
-                        break
-                    case 'toggle':
+                            },
+                        });
+                        break;
+                    }
+
+                    case 'toggle': {
                         node.device.set({
                             onOff: {
-                                        onOff: !node.device.state.onOff.onOff,
-                                    }
-                        })
-                        break
-                    
+                                onOff: !node.device.state.onOff.onOff,
+                            },
+                        });
+                        break;
+                    }
                 }
             }
         });
 
-        this.on('serverReady', function() {
-            this.status({fill:"green",shape:"dot",text:"ready"});
-        })
+        this.on('serverReady', function () {
+            this.status({fill: 'green', shape: 'dot', text: 'ready'});
+        });
 
-        this.on('state', function(data){
+        this.on('state', data => {
             if ((node.pending && node.passthrough)) {
-                var msg = node.pendingmsg
-                msg.payload.state = node.device.state.onOff.onOff
-                msg.payload.level = node.device.state.levelControl.currentLevel
-                if (node.range == "100"){ msg.payload.level = Math.round(msg.payload.level/2.54)}
-                msg.payload.temp = Math.floor(1000000/node.device.state.colorControl.colorTemperatureMireds)
-                node.send(msg);
-            } else if (!node.pending){
-                var msg = {payload : {}};
-                msg.payload.state = node.device.state.onOff.onOff
-                msg.payload.level = node.device.state.levelControl.currentLevel
-                if (node.range == "100"){ msg.payload.level = Math.round(msg.payload.level/2.54)}
-                msg.payload.temp = Math.floor(1000000/node.device.state.colorControl.colorTemperatureMireds)
-                node.send(msg);
-            }
-            node.pending = false
-        })
+                var message = node.pendingmsg;
+                message.payload.state = node.device.state.onOff.onOff;
+                message.payload.level = node.device.state.levelControl.currentLevel;
+                if (node.range == '100') {
+                    message.payload.level = Math.round(message.payload.level / 2.54);
+                }
 
-        this.on('identify', function(data){
-            if (data){
-                this.status({fill:"blue",shape:"dot",text:"identify"});
+                message.payload.temp = Math.floor(1_000_000 / node.device.state.colorControl.colorTemperatureMireds);
+                node.send(message);
+            } else if (!node.pending) {
+                var message = {payload: {}};
+                message.payload.state = node.device.state.onOff.onOff;
+                message.payload.level = node.device.state.levelControl.currentLevel;
+                if (node.range == '100') {
+                    message.payload.level = Math.round(message.payload.level / 2.54);
+                }
+
+                message.payload.temp = Math.floor(1_000_000 / node.device.state.colorControl.colorTemperatureMireds);
+                node.send(message);
+            }
+
+            node.pending = false;
+        });
+
+        this.on('identify', function (data) {
+            if (data) {
+                this.status({fill: 'blue', shape: 'dot', text: 'identify'});
             } else {
-                this.status({fill:"green",shape:"dot",text:"ready"});
+                this.status({fill: 'green', shape: 'dot', text: 'ready'});
             }
-            
-        })
+        });
 
-        this.on('close', function(removed, done) {
-            this.off('state')
-            this.off('serverReady')
-            this.off('identify')
+        this.on('close', function (removed, done) {
+            this.off('state');
+            this.off('serverReady');
+            this.off('identify');
             if (removed) {
                 // This node has been disabled/deleted
             } else {
                 // This node is being restarted
             }
+
             done();
         });
         //Wait till server is started
         function waitforserver(node) {
-            if (!node.bridge.serverReady) {
-              setTimeout(waitforserver, 100, node)
+            if (node.bridge.serverReady) {
+                console.log('Registering Child......');
+                node.bridge.emit('registerChild', node);
             } else {
-                console.log('Registering Child......')
-                node.bridge.emit('registerChild', node)
+                setTimeout(waitforserver, 100, node);
             }
         }
-        waitforserver(node)
-        
 
+        waitforserver(node);
     }
-    RED.nodes.registerType("mattercolortemplight",MatterColorTempLight);
-}
+
+    RED.nodes.registerType('mattercolortemplight', MatterColorTemporaryLight);
+};

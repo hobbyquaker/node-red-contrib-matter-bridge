@@ -1,10 +1,9 @@
-const  Endpoint  = require("@project-chip/matter.js/endpoint").Endpoint;
-const  BridgedDeviceBasicInformationServer  = require("@project-chip/matter.js/behavior/definitions/bridged-device-basic-information").BridgedDeviceBasicInformationServer;
-const  DimmableLightDevice   = require("@project-chip/matter.js/devices/DimmableLightDevice").DimmableLightDevice
-
+const {Endpoint} = require('@project-chip/matter.js/endpoint');
+const {BridgedDeviceBasicInformationServer} = require('@project-chip/matter.js/behavior/definitions/bridged-device-basic-information');
+const {DimmableLightDevice} = require('@project-chip/matter.js/devices/DimmableLightDevice');
 
 module.exports = {
-    dimmablelight: function(child) {
+    dimmablelight(child) {
         const device = new Endpoint(
             DimmableLightDevice.with(BridgedDeviceBasicInformationServer),
             {
@@ -16,19 +15,19 @@ module.exports = {
                     serialNumber: child.id,
                     reachable: true,
                 },
-        });
+            });
         device.events.onOff.onOff$Changed.on(value => {
-            child.emit('state', value)
+            child.emit('state', value);
         });
         device.events.levelControl.currentLevel$Changed.on(value => {
-            child.emit('state', value)
-        })
+            child.emit('state', value);
+        });
         device.events.identify.startIdentifying.on(() => {
-            child.emit('identify', true)
+            child.emit('identify', true);
         });
         device.events.identify.stopIdentifying.on(() => {
-            child.emit('identify', false)
+            child.emit('identify', false);
         });
         return device;
-    }
- }
+    },
+};

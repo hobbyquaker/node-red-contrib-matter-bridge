@@ -1,12 +1,12 @@
-const  Endpoint  = require("@project-chip/matter.js/endpoint").Endpoint;
-const  BridgedDeviceBasicInformationServer  = require("@project-chip/matter.js/behavior/definitions/bridged-device-basic-information").BridgedDeviceBasicInformationServer;
-const  ContactSensorDevice  =  require( "@project-chip/matter.js/devices/ContactSensorDevice").ContactSensorDevice;
-const  BooleanState  =  require( "@project-chip/matter.js/cluster").BooleanState; 
+const {Endpoint} = require('@project-chip/matter.js/endpoint');
+const {BridgedDeviceBasicInformationServer} = require('@project-chip/matter.js/behavior/definitions/bridged-device-basic-information');
+const {ContactSensorDevice} = require('@project-chip/matter.js/devices/ContactSensorDevice');
+const {BooleanState} = require('@project-chip/matter.js/cluster');
 
 module.exports = {
-    contactsensor: function(child) {
+    contactsensor(child) {
         const device = new Endpoint(
-            ContactSensorDevice.with(BridgedDeviceBasicInformationServer),{
+            ContactSensorDevice.with(BridgedDeviceBasicInformationServer), {
                 id: child.id,
                 bridgedDeviceBasicInformation: {
                     nodeLabel: child.name,
@@ -16,16 +16,16 @@ module.exports = {
                     reachable: true,
                 },
                 booleanState: {
-                    stateValue: child.initial
-                }
-            }
-            )
-            device.events.identify.startIdentifying.on(() => {
-                child.emit('identify', true)
-            });
-            device.events.identify.stopIdentifying.on(() => {
-                child.emit('identify', false)
-            });
-            return device;
-    }
- }
+                    stateValue: child.initial,
+                },
+            },
+        );
+        device.events.identify.startIdentifying.on(() => {
+            child.emit('identify', true);
+        });
+        device.events.identify.stopIdentifying.on(() => {
+            child.emit('identify', false);
+        });
+        return device;
+    },
+};
