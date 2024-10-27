@@ -1,11 +1,11 @@
 {
-  "name": "@sammachin/node-red-matter-bridge",
-  "version": "0.0.10-beta2",
+  "name": "node-red-contrib-matter-bridge",
+  "version": "0.0.1",
   "description": "Node red package for implementing a matter bridge",
   "main": "index.js",
   "author": "Sam Machin",
   "license": "MIT",
-  "repository": "https://github.com/sammachin/node-red-matter-bridge",
+  "repository": "https://github.com/hobbyquaker/node-red-contrib-matter-bridge",
   "dependencies": {
     "@project-chip/matter-node.js": "^0.10.0",
     "color-convert": "^2.0.1"
@@ -24,7 +24,7 @@
       "matter-onoffsocket": "onoffsocket.js",
       "matter-dimmablelight": "dimmablelight.js",
       "matter-fullcolorlight": "fullcolorlight.js",
-      "matter-colortemplight" : "colortemplight.js",
+      "matter-colortemplight": "colortemplight.js",
       "matter-contactsensor": "contactsensor.js",
       "matter-lightsensor": "lightsensor.js",
       "matter-temperaturesensor": "temperaturesensor.js",
