@@ -1,4 +1,4 @@
-const thermostat = require('./devices/thermostat');
+const thermostat = require('../devices/thermostat.js');
 
 module.exports = function (RED) {
     function MatterThermostat(config) {

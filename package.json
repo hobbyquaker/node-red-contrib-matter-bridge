@@ -19,22 +19,22 @@
   "node-red": {
     "version": ">=3.0.0",
     "nodes": {
-      "matter-bridge": "bridge.js",
-      "matter-onofflight": "onofflight.js",
-      "matter-onoffsocket": "onoffsocket.js",
-      "matter-dimmablelight": "dimmablelight.js",
-      "matter-fullcolorlight": "fullcolorlight.js",
-      "matter-colortemplight": "colortemplight.js",
-      "matter-contactsensor": "contactsensor.js",
-      "matter-lightsensor": "lightsensor.js",
-      "matter-temperaturesensor": "temperaturesensor.js",
-      "matter-occupancysensor": "occupancysensor.js",
-      "matter-pressuresensor": "pressuresensor.js",
-      "matter-humiditysensor": "humiditysensor.js",
-      "matter-genercswitch": "genericswitch.js",
-      "matter-windowcovering": "windowcovering.js",
-      "matter-thermostat": "thermostat.js",
-      "matter-doorlock": "doorlock.js"
+      "matter-bridge": "nodes/bridge.js",
+      "matter-onofflight": "nodes/onofflight.js",
+      "matter-onoffsocket": "nodes/onoffsocket.js",
+      "matter-dimmablelight": "nodes/dimmablelight.js",
+      "matter-fullcolorlight": "nodes/fullcolorlight.js",
+      "matter-colortemplight": "nodes/colortemplight.js",
+      "matter-contactsensor": "nodes/contactsensor.js",
+      "matter-lightsensor": "nodes/lightsensor.js",
+      "matter-temperaturesensor": "nodes/temperaturesensor.js",
+      "matter-occupancysensor": "nodes/occupancysensor.js",
+      "matter-pressuresensor": "nodes/pressuresensor.js",
+      "matter-humiditysensor": "nodes/humiditysensor.js",
+      "matter-genercswitch": "nodes/genericswitch.js",
+      "matter-windowcovering": "nodes/windowcovering.js",
+      "matter-thermostat": "nodes/thermostat.js",
+      "matter-doorlock": "nodes/doorlock.js"
     }
   },
   "devDependencies": {
@@ -47,7 +47,6 @@
       "capitalized-comments": 0,
       "unicorn/prevent-abbreviations": "warn",
       "unicorn/no-this-assignment": "warn",
-      "unicorn/anonymous-default-export": "warn",
       "unicorn/prefer-module": 0
     }
   }

@@ -1,7 +1,6 @@
 const {Endpoint} = require('@project-chip/matter.js/endpoint');
 const {BridgedDeviceBasicInformationServer} = require('@project-chip/matter.js/behavior/definitions/bridged-device-basic-information');
 const {HumiditySensorDevice} = require('@project-chip/matter.js/devices/HumiditySensorDevice');
-const temperaturesensor = require('../temperaturesensor');
 
 module.exports = {
     humiditysensor(child) {

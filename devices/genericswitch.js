@@ -4,7 +4,6 @@ const {BridgedDeviceBasicInformationServer} = require('@project-chip/matter.js/b
 const {GenericSwitchDevice} = require('@project-chip/matter.js/devices/GenericSwitchDevice');
 const {SwitchServer} = require('@project-chip/matter.js/behavior/definitions/switch');
 const {Switch} = require('@project-chip/matter.js/cluster');
-const temperaturesensor = require('../temperaturesensor');
 
 module.exports = {
     genericswitch(child) {
